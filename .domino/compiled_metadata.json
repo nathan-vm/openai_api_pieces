@@ -292,6 +292,29 @@
         "description": "Extracts user-defined information from the input text.",
         "input_schema": {
             "$defs": {
+                "InputItem": {
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "type": {
+                            "title": "Type",
+                            "type": "string"
+                        },
+                        "description": {
+                            "title": "Description",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "type",
+                        "description"
+                    ],
+                    "title": "InputItem",
+                    "type": "object"
+                },
                 "LLMModelType": {
                     "description": "OpenAI model type",
                     "enum": [
@@ -300,50 +323,6 @@
                     ],
                     "title": "LLMModelType",
                     "type": "string"
-                },
-                "OutputModifierItemType": {
-                    "description": "OutputArgsType Enum",
-                    "enum": [
-                        "string",
-                        "integer",
-                        "float",
-                        "boolean",
-                        "array"
-                    ],
-                    "title": "OutputModifierItemType",
-                    "type": "string"
-                },
-                "OutputModifierModel": {
-                    "properties": {
-                        "name": {
-                            "description": "Name of the output argument.",
-                            "from_upstream": "never",
-                            "title": "Name",
-                            "type": "string"
-                        },
-                        "type": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/$defs/OutputModifierItemType"
-                                }
-                            ],
-                            "default": "string",
-                            "description": "Type of the output argument.",
-                            "from_upstream": "never"
-                        },
-                        "description": {
-                            "default": "",
-                            "description": "Description of the output argument.",
-                            "from_upstream": "never",
-                            "title": "Description",
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "name"
-                    ],
-                    "title": "OutputModifierModel",
-                    "type": "object"
                 }
             },
             "description": "InformationExtractionPiece Input model",
@@ -392,7 +371,7 @@
                     "description": "Information items to be extracted from source text.",
                     "from_upstream": "never",
                     "items": {
-                        "$ref": "#/$defs/OutputModifierModel"
+                        "$ref": "#/$defs/InputItem"
                     },
                     "title": "Extract Items",
                     "type": "array"
