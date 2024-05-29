@@ -21,6 +21,7 @@ class InputModel(BaseModel):
         json_schema_extra={"from_upstream": "always"}
     )
     additional_information: Optional[str] = Field(
+        default=None,
         description='Additional useful information to help with the extraction.',
     )
     openai_model: LLMModelType = Field(
