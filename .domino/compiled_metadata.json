@@ -278,7 +278,7 @@
             "openai"
         ],
         "style": {
-            "node_label": "Information Extraction Str",
+            "node_label": "File Information Extraction",
             "node_type": "default",
             "node_style": {
                 "backgroundColor": "#ebebeb"
@@ -353,6 +353,19 @@
                     "from_upstream": "always",
                     "title": "Input File Path",
                     "type": "string"
+                },
+                "additional_information": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Additional useful information to help with the extraction.",
+                    "title": "Additional Information"
                 },
                 "openai_model": {
                     "allOf": [
