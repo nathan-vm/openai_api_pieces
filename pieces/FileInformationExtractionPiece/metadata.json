@@ -10,7 +10,7 @@
         "openai"
     ],
     "style": {
-        "node_label": "Information Extraction Str",
+        "node_label": "File Information Extraction",
         "icon_class_name": "fa-solid:align-right"
     }
 }

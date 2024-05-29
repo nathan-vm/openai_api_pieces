@@ -2,7 +2,7 @@ from domino.base_piece import BasePiece
 from .models import InputModel, OutputModel, SecretsModel
 from openai import OpenAI
 import json
-from typing import Union
+from typing import Union, Optional
 import pickle
 
 
@@ -21,11 +21,13 @@ class FileInformationExtractionPiece(BasePiece):
         result = []
 
         if isinstance(file_content, dict):
-            output_json = self.extract_json_infos(content=file_content, extract_items=input_data.extract_items)
+            output_json = self.extract_json_infos(content=file_content, extract_items=input_data.extract_items, model=input_data.openai_model)
             result.append(output_json)
         elif isinstance(file_content, list):
-            for item_content in file_content:
-                output_json = self.extract_json_infos(content=item_content, extract_items=input_data.extract_items)
+            file_content = file_content[:2] # TODO - remove
+            for i, item_content in enumerate(file_content):
+                self.logger.info(f"Extract item i:{i}")
+                output_json = self.extract_json_infos(content=item_content, extract_items=input_data.extract_items, model=input_data.openai_model)
                 result.append(output_json)
 
         # Return extracted information
@@ -34,7 +36,9 @@ class FileInformationExtractionPiece(BasePiece):
         self.format_display_result_table(input_data, result)
         return OutputModel(output_data=result)
 
-    def extract_json_infos(self, content: dict, extract_items: dict, model: str):
+    def extract_json_infos(self, content: dict, extract_items: dict, model: str, additional_info: Optional[str] = None):
+
+        optional_additional_info = "" if not additional_info else f"additional information to compute:{additional_info}"
 
         prompt = f"""Extract the following information from the text below as JSON.
 The output can be a simple json or a list of jsons but never a nested json.
@@ -43,6 +47,8 @@ Use the items to be extract as information to identify the right information to 
 Input text: {content}
 Items to be extracted:
 {extract_items}
+
+{optional_additional_info}
 """
         response = self.client.chat.completions.create(
             response_format={

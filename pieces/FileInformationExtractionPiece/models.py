@@ -20,6 +20,9 @@ class InputModel(BaseModel):
         description='Source text from where information should be extracted.',
         json_schema_extra={"from_upstream": "always"}
     )
+    additional_information: Optional[str] = Field(
+        description='Additional useful information to help with the extraction.',
+    )
     openai_model: LLMModelType = Field(
         default=LLMModelType.gpt_3_5_turbo,
         description="OpenAI model name to use for information extraction.",
