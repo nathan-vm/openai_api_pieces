@@ -1,9 +1,9 @@
 [repository]
 # Must be in lower-case letters
-REGISTRY_NAME = "tauffer-consulting"
+REGISTRY_NAME = "nathan-vm"
 
 # The name of this Pieces repository
-REPOSITORY_NAME = "openai_domino_pieces"
+REPOSITORY_NAME = "openai_api_pieces"
 REPOSITORY_LABEL = "OpenAI Domino Pieces"
 
 # The version of this Pieces release
