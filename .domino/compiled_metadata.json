@@ -1,157 +1,101 @@
 {
-    "InformationExtractionPiece": {
-        "name": "InformationExtractionPiece",
+    "AudioTranscriptionPiece": {
+        "name": "AudioTranscriptionPiece",
         "dependency": {
             "dockerfile": "Dockerfile_01",
             "requirements_file": null
         },
         "tags": [
-            "text",
-            "information extraction",
-            "openai"
+            "OpenAI"
         ],
         "style": {
-            "node_label": "Information Extraction",
+            "node_label": "OpenAI Audio Transcript",
             "node_type": "default",
             "node_style": {
                 "backgroundColor": "#ebebeb"
             },
             "useIcon": true,
-            "icon_class_name": "fa-solid:align-right",
+            "icon_class_name": "fa-solid:comment-dots",
             "iconStyle": {
                 "cursor": "pointer"
             }
         },
-        "description": "Extracts user-defined information from the input text.",
+        "description": "This Piece uses the OpenAI API to extract text transcripts from audio.",
+        "container_resources": {
+            "requests": {
+                "cpu": 100,
+                "memory": 128
+            },
+            "limits": {
+                "cpu": 500,
+                "memory": 512
+            }
+        },
         "input_schema": {
             "$defs": {
-                "LLMModelType": {
-                    "description": "OpenAI model type",
+                "OutputTypeType": {
                     "enum": [
-                        "gpt-3.5-turbo-1106",
-                        "gpt-4"
-                    ],
-                    "title": "LLMModelType",
-                    "type": "string"
-                },
-                "OutputModifierItemType": {
-                    "description": "OutputArgsType Enum",
-                    "enum": [
+                        "file",
                         "string",
-                        "integer",
-                        "float",
-                        "boolean",
-                        "array"
+                        "both"
                     ],
-                    "title": "OutputModifierItemType",
+                    "title": "OutputTypeType",
                     "type": "string"
-                },
-                "OutputModifierModel": {
-                    "properties": {
-                        "name": {
-                            "description": "Name of the output argument.",
-                            "from_upstream": "never",
-                            "title": "Name",
-                            "type": "string"
-                        },
-                        "type": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/$defs/OutputModifierItemType"
-                                }
-                            ],
-                            "default": "string",
-                            "description": "Type of the output argument.",
-                            "from_upstream": "never"
-                        },
-                        "description": {
-                            "default": "",
-                            "description": "Description of the output argument.",
-                            "from_upstream": "never",
-                            "title": "Description",
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "name"
-                    ],
-                    "title": "OutputModifierModel",
-                    "type": "object"
                 }
             },
-            "description": "InformationExtractionPiece Input model",
             "properties": {
-                "input_text": {
-                    "description": "Source text from where information should be extracted.",
+                "audio_file_path": {
+                    "description": "The path to the audio file to process.",
                     "from_upstream": "always",
-                    "title": "Input Text",
+                    "title": "Audio File Path",
                     "type": "string"
                 },
-                "openai_model": {
+                "output_type": {
                     "allOf": [
                         {
-                            "$ref": "#/$defs/LLMModelType"
+                            "$ref": "#/$defs/OutputTypeType"
                         }
                     ],
-                    "default": "gpt-3.5-turbo-1106",
-                    "description": "OpenAI model name to use for information extraction."
+                    "default": "string",
+                    "description": "The type of output for the result text. Options are `string`, `file` or `both`. Default is `string`."
                 },
-                "extract_items": {
-                    "default": [
-                        {
-                            "description": "Name of the person.",
-                            "name": "name",
-                            "type": "string"
-                        },
-                        {
-                            "description": "Age of the person.",
-                            "name": "age",
-                            "type": "integer"
-                        }
-                    ],
-                    "description": "Information items to be extracted from source text.",
-                    "from_upstream": "never",
-                    "items": {
-                        "$ref": "#/$defs/OutputModifierModel"
-                    },
-                    "title": "Extract Items",
-                    "type": "array"
+                "temperature": {
+                    "default": 0.1,
+                    "description": "What sampling temperature to use, between 0 and 1",
+                    "exclusiveMinimum": 0.0,
+                    "maximum": 1.0,
+                    "title": "Temperature",
+                    "type": "number"
                 }
             },
             "required": [
-                "input_text"
+                "audio_file_path"
             ],
             "title": "InputModel",
             "type": "object"
         },
         "output_schema": {
-            "additionalProperties": true,
-            "description": "InformationExtractionPiece Output Model",
             "properties": {
-                "output_data": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "description": "Extracted information as Stringfieid JSON.",
-                    "title": "Output Data"
+                "transcription_result": {
+                    "default": "",
+                    "description": "The result transcription text as a string.",
+                    "title": "Transcription Result",
+                    "type": "string"
+                },
+                "file_path_transcription_result": {
+                    "default": "",
+                    "description": "The path to the text file with the transcription result.",
+                    "title": "File Path Transcription Result",
+                    "type": "string"
                 }
             },
-            "required": [
-                "output_data"
-            ],
             "title": "OutputModel",
             "type": "object"
         },
         "secrets_schema": {
-            "description": "InformationExtractionPiece Secrets model",
             "properties": {
                 "OPENAI_API_KEY": {
-                    "description": "Your OpenAI API key.",
+                    "description": "OpenAI API key",
                     "title": "Openai Api Key",
                     "type": "string"
                 }
@@ -162,7 +106,7 @@
             "title": "SecretsModel",
             "type": "object"
         },
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/InformationExtractionPiece"
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/AudioTranscriptionPiece"
     },
     "TextTaggingPiece": {
         "name": "TextTaggingPiece",
@@ -320,105 +264,156 @@
             "title": "SecretsModel",
             "type": "object"
         },
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/TextTaggingPiece"
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/TextTaggingPiece"
     },
-    "AudioTranscriptionPiece": {
-        "name": "AudioTranscriptionPiece",
+    "FileInformationExtractionPiece": {
+        "name": "FileInformationExtractionPiece",
         "dependency": {
             "dockerfile": "Dockerfile_01",
             "requirements_file": null
         },
         "tags": [
-            "OpenAI"
+            "text",
+            "information extraction",
+            "openai"
         ],
         "style": {
-            "node_label": "OpenAI Audio Transcript",
+            "node_label": "Information Extraction Str",
             "node_type": "default",
             "node_style": {
                 "backgroundColor": "#ebebeb"
             },
             "useIcon": true,
-            "icon_class_name": "fa-solid:comment-dots",
+            "icon_class_name": "fa-solid:align-right",
             "iconStyle": {
                 "cursor": "pointer"
             }
         },
-        "description": "This Piece uses the OpenAI API to extract text transcripts from audio.",
-        "container_resources": {
-            "requests": {
-                "cpu": 100,
-                "memory": 128
-            },
-            "limits": {
-                "cpu": 500,
-                "memory": 512
-            }
-        },
+        "description": "Extracts user-defined information from the input text.",
         "input_schema": {
             "$defs": {
-                "OutputTypeType": {
+                "LLMModelType": {
+                    "description": "OpenAI model type",
                     "enum": [
-                        "file",
-                        "string",
-                        "both"
+                        "gpt-3.5-turbo-1106",
+                        "gpt-4"
                     ],
-                    "title": "OutputTypeType",
+                    "title": "LLMModelType",
                     "type": "string"
+                },
+                "OutputModifierItemType": {
+                    "description": "OutputArgsType Enum",
+                    "enum": [
+                        "string",
+                        "integer",
+                        "float",
+                        "boolean",
+                        "array"
+                    ],
+                    "title": "OutputModifierItemType",
+                    "type": "string"
+                },
+                "OutputModifierModel": {
+                    "properties": {
+                        "name": {
+                            "description": "Name of the output argument.",
+                            "from_upstream": "never",
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "type": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/$defs/OutputModifierItemType"
+                                }
+                            ],
+                            "default": "string",
+                            "description": "Type of the output argument.",
+                            "from_upstream": "never"
+                        },
+                        "description": {
+                            "default": "",
+                            "description": "Description of the output argument.",
+                            "from_upstream": "never",
+                            "title": "Description",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name"
+                    ],
+                    "title": "OutputModifierModel",
+                    "type": "object"
                 }
             },
+            "description": "InformationExtractionPiece Input model",
             "properties": {
-                "audio_file_path": {
-                    "description": "The path to the audio file to process.",
+                "input_file_path": {
+                    "description": "Source text from where information should be extracted.",
                     "from_upstream": "always",
-                    "title": "Audio File Path",
+                    "title": "Input File Path",
                     "type": "string"
                 },
-                "output_type": {
+                "openai_model": {
                     "allOf": [
                         {
-                            "$ref": "#/$defs/OutputTypeType"
+                            "$ref": "#/$defs/LLMModelType"
                         }
                     ],
-                    "default": "string",
-                    "description": "The type of output for the result text. Options are `string`, `file` or `both`. Default is `string`."
+                    "default": "gpt-3.5-turbo-1106",
+                    "description": "OpenAI model name to use for information extraction."
                 },
-                "temperature": {
-                    "default": 0.1,
-                    "description": "What sampling temperature to use, between 0 and 1",
-                    "exclusiveMinimum": 0.0,
-                    "maximum": 1.0,
-                    "title": "Temperature",
-                    "type": "number"
+                "extract_items": {
+                    "default": [
+                        {
+                            "description": "Name of the person.",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "description": "Age of the person.",
+                            "name": "age",
+                            "type": "integer"
+                        }
+                    ],
+                    "description": "Information items to be extracted from source text.",
+                    "from_upstream": "never",
+                    "items": {
+                        "$ref": "#/$defs/OutputModifierModel"
+                    },
+                    "title": "Extract Items",
+                    "type": "array"
                 }
             },
             "required": [
-                "audio_file_path"
+                "input_file_path"
             ],
             "title": "InputModel",
             "type": "object"
         },
         "output_schema": {
+            "description": "InformationExtractionPiece Output Model",
             "properties": {
-                "transcription_result": {
-                    "default": "",
-                    "description": "The result transcription text as a string.",
-                    "title": "Transcription Result",
-                    "type": "string"
-                },
-                "file_path_transcription_result": {
-                    "default": "",
-                    "description": "The path to the text file with the transcription result.",
-                    "title": "File Path Transcription Result",
-                    "type": "string"
+                "output_data": {
+                    "description": "Extracted information as JSON.",
+                    "items": {
+                        "type": "object"
+                    },
+                    "title": "Output Data",
+                    "type": "array"
                 }
             },
+            "required": [
+                "output_data"
+            ],
             "title": "OutputModel",
             "type": "object"
         },
         "secrets_schema": {
+            "description": "InformationExtractionPiece Secrets model",
             "properties": {
                 "OPENAI_API_KEY": {
-                    "description": "OpenAI API key",
+                    "description": "Your OpenAI API key.",
                     "title": "Openai Api Key",
                     "type": "string"
                 }
@@ -429,79 +424,62 @@
             "title": "SecretsModel",
             "type": "object"
         },
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/AudioTranscriptionPiece"
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/FileInformationExtractionPiece"
     },
-    "TextSummarizerLocalPiece": {
-        "name": "TextSummarizerLocalPiece",
+    "PromptCreatorForImageGeneratorPiece": {
+        "name": "PromptCreatorForImageGeneratorPiece",
         "dependency": {
-            "dockerfile": "Dockerfile_summarizer",
+            "dockerfile": "Dockerfile_01",
             "requirements_file": null
         },
         "tags": [],
         "style": {
-            "node_label": "Text Summarizer Local Piece",
+            "node_label": "Prompt Creator for Image Generator AI",
             "node_type": "default",
             "node_style": {
                 "backgroundColor": "#ebebeb"
             },
             "useIcon": true,
-            "icon_class_name": "fa-solid:quote-left",
+            "icon_class_name": "fa-solid:terminal",
             "iconStyle": {
                 "cursor": "pointer"
             }
         },
-        "description": "Text Summarizer with local model",
-        "container_resources": {
-            "use_gpu": true,
-            "requests": {
-                "cpu": 1000,
-                "memory": 3072
-            },
-            "limits": {
-                "cpu": 5000,
-                "memory": 15360
-            }
-        },
+        "description": "This Piece utilizes OpenAI to generates a prompt to pass to an image generator AI.",
         "input_schema": {
             "$defs": {
-                "OutputTypeType": {
+                "LLMModelType": {
+                    "description": "OpenAI model type",
                     "enum": [
-                        "xcom",
-                        "file"
+                        "gpt-3.5-turbo",
+                        "gpt-4"
+                    ],
+                    "title": "LLMModelType",
+                    "type": "string"
+                },
+                "OutputTypeType": {
+                    "description": "Output type",
+                    "enum": [
+                        "file",
+                        "string",
+                        "file_and_string"
                     ],
                     "title": "OutputTypeType",
                     "type": "string"
                 }
             },
-            "description": "Input data for TextSummarizerPiece",
+            "description": "PromptCreatorForImageGeneratorPiece input model",
             "properties": {
-                "input_file_path": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": "",
-                    "description": "The path to the text file to summarize.",
-                    "from_upstream": "always",
-                    "title": "Input File Path"
+                "context": {
+                    "description": "The context to generate an image from",
+                    "title": "Context",
+                    "type": "string"
                 },
-                "input_text": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": "",
-                    "description": "The text to summarize.",
-                    "title": "Input Text",
-                    "widget": "textarea"
+                "art_style": {
+                    "default": "You know many art styles, so you always vary a lot on your suggestions!",
+                    "description": "Realistic",
+                    "title": "Art Style",
+                    "type": "string"
                 },
                 "output_type": {
                     "allOf": [
@@ -509,54 +487,218 @@
                             "$ref": "#/$defs/OutputTypeType"
                         }
                     ],
-                    "default": "xcom",
-                    "description": "The type of output fot the result text."
+                    "default": "string",
+                    "description": "The type of output to return"
                 },
-                "use_gpu": {
-                    "default": false,
-                    "description": "Use GPU for inference.",
-                    "title": "Use Gpu",
-                    "type": "boolean"
+                "openai_model": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/LLMModelType"
+                        }
+                    ],
+                    "default": "gpt-3.5-turbo",
+                    "description": "OpenAI model to bring your character to life"
+                },
+                "completion_max_tokens": {
+                    "default": 350,
+                    "description": "The maximum number of tokens to generate the prompt.",
+                    "title": "Completion Max Tokens",
+                    "type": "integer"
+                },
+                "temperature": {
+                    "default": 0.7,
+                    "description": "Temperature of the model, between 0 (more precise) and 1 (more creative)",
+                    "exclusiveMinimum": 0.0,
+                    "maximum": 1.0,
+                    "title": "Temperature",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "context"
+            ],
+            "title": "InputModel",
+            "type": "object"
+        },
+        "output_schema": {
+            "description": "PromptCreatorForImageGeneratorPiece output model",
+            "properties": {
+                "generated_prompt_string": {
+                    "default": null,
+                    "description": "The generated prompt to pass to an image generator AI",
+                    "title": "Generated Prompt String",
+                    "type": "string"
+                },
+                "generated_prompt_file_path": {
+                    "default": null,
+                    "description": "The path to the generated prompt, in .txt format",
+                    "title": "Generated Prompt File Path",
+                    "type": "string"
+                }
+            },
+            "title": "OutputModel",
+            "type": "object"
+        },
+        "secrets_schema": {
+            "description": "PromptCreatorForImageGeneratorPiece secrets model",
+            "properties": {
+                "OPENAI_API_KEY": {
+                    "description": "Your OpenAI API key",
+                    "title": "Openai Api Key",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "OPENAI_API_KEY"
+            ],
+            "title": "SecretsModel",
+            "type": "object"
+        },
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/PromptCreatorForImageGeneratorPiece"
+    },
+    "TextSummarizerPiece": {
+        "name": "TextSummarizerPiece",
+        "dependency": {
+            "dockerfile": "Dockerfile_01",
+            "requirements_file": null
+        },
+        "tags": [
+            "text",
+            "summarizer",
+            "openai"
+        ],
+        "style": {
+            "node_label": "Text Summarizer",
+            "node_type": "default",
+            "node_style": {
+                "backgroundColor": "#ebebeb"
+            },
+            "useIcon": true,
+            "icon_class_name": "fa-solid:align-right",
+            "iconStyle": {
+                "cursor": "pointer"
+            }
+        },
+        "description": "This Piece runs a text summarizer using OpenAI API.",
+        "input_schema": {
+            "$defs": {
+                "LLMModelType": {
+                    "description": "OpenAI model type",
+                    "enum": [
+                        "gpt-3.5-turbo",
+                        "gpt-4"
+                    ],
+                    "title": "LLMModelType",
+                    "type": "string"
+                },
+                "OutputTypeType": {
+                    "description": "Output type for the completion result",
+                    "enum": [
+                        "file",
+                        "string",
+                        "file_and_string"
+                    ],
+                    "title": "OutputTypeType",
+                    "type": "string"
+                }
+            },
+            "description": "TextSummarizerPiece Input model",
+            "properties": {
+                "text": {
+                    "default": "",
+                    "description": "Text to summarize",
+                    "title": "Text",
+                    "type": "string",
+                    "widget": "textarea"
+                },
+                "text_file_path": {
+                    "default": "",
+                    "description": "Use it only if not using text field. File path to the text to summarize",
+                    "from_upstream": "always",
+                    "title": "Text File Path",
+                    "type": "string"
+                },
+                "output_type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/OutputTypeType"
+                        }
+                    ],
+                    "default": "string",
+                    "description": "The type of output to return"
+                },
+                "openai_model": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/LLMModelType"
+                        }
+                    ],
+                    "default": "gpt-3.5-turbo",
+                    "description": "OpenAI model name to use for summarization"
+                },
+                "chunk_size": {
+                    "default": 1000,
+                    "description": "Chunk size, measured in tokens, of each pre-summary chunk",
+                    "title": "Chunk Size",
+                    "type": "integer"
+                },
+                "chunk_overlap_rate": {
+                    "default": 0.2,
+                    "description": "The percentage of overlap between each chunk",
+                    "title": "Chunk Overlap Rate",
+                    "type": "number"
+                },
+                "completion_max_tokens": {
+                    "default": 500,
+                    "description": "The maximum number of tokens to generate in the summary.",
+                    "title": "Completion Max Tokens",
+                    "type": "integer"
+                },
+                "temperature": {
+                    "default": 0.2,
+                    "description": "Temperature of the model, between 0 (more precise) and 1 (more creative)",
+                    "title": "Temperature",
+                    "type": "number"
                 }
             },
             "title": "InputModel",
             "type": "object"
         },
         "output_schema": {
-            "description": "Output data for TextSummarizerPiece",
+            "description": "TextSummarizerPiece Output model",
             "properties": {
-                "message": {
-                    "default": "",
-                    "description": "Output message to log.",
-                    "title": "Message",
+                "string_summarized_text": {
+                    "default": null,
+                    "description": "summarized text",
+                    "title": "String Summarized Text",
                     "type": "string"
                 },
-                "summary_result": {
-                    "default": "",
-                    "description": "The result summarized text.",
-                    "title": "Summary Result",
+                "file_path_summarized_text": {
+                    "default": null,
+                    "description": "Path to summarized text file",
+                    "title": "File Path Summarized Text",
                     "type": "string"
-                },
-                "file_path": {
-                    "anyOf": [
-                        {
-                            "format": "file-path",
-                            "type": "string"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ],
-                    "default": "",
-                    "description": "The path to the resulting summarized text file.",
-                    "title": "File Path"
                 }
             },
             "title": "OutputModel",
             "type": "object"
         },
-        "secrets_schema": null,
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/TextSummarizerLocalPiece"
+        "secrets_schema": {
+            "description": "TextSummarizerPiece Secrets model",
+            "properties": {
+                "OPENAI_API_KEY": {
+                    "description": "Your OpenAI API key",
+                    "title": "Openai Api Key",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "OPENAI_API_KEY"
+            ],
+            "title": "SecretsModel",
+            "type": "object"
+        },
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/TextSummarizerPiece"
     },
     "TextGeneratorPiece": {
         "name": "TextGeneratorPiece",
@@ -751,151 +893,21 @@
             "title": "SecretsModel",
             "type": "object"
         },
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/TextGeneratorPiece"
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/TextGeneratorPiece"
     },
-    "PromptCreatorForImageGeneratorPiece": {
-        "name": "PromptCreatorForImageGeneratorPiece",
-        "dependency": {
-            "dockerfile": "Dockerfile_01",
-            "requirements_file": null
-        },
-        "tags": [],
-        "style": {
-            "node_label": "Prompt Creator for Image Generator AI",
-            "node_type": "default",
-            "node_style": {
-                "backgroundColor": "#ebebeb"
-            },
-            "useIcon": true,
-            "icon_class_name": "fa-solid:terminal",
-            "iconStyle": {
-                "cursor": "pointer"
-            }
-        },
-        "description": "This Piece utilizes OpenAI to generates a prompt to pass to an image generator AI.",
-        "input_schema": {
-            "$defs": {
-                "LLMModelType": {
-                    "description": "OpenAI model type",
-                    "enum": [
-                        "gpt-3.5-turbo",
-                        "gpt-4"
-                    ],
-                    "title": "LLMModelType",
-                    "type": "string"
-                },
-                "OutputTypeType": {
-                    "description": "Output type",
-                    "enum": [
-                        "file",
-                        "string",
-                        "file_and_string"
-                    ],
-                    "title": "OutputTypeType",
-                    "type": "string"
-                }
-            },
-            "description": "PromptCreatorForImageGeneratorPiece input model",
-            "properties": {
-                "context": {
-                    "description": "The context to generate an image from",
-                    "title": "Context",
-                    "type": "string"
-                },
-                "art_style": {
-                    "default": "You know many art styles, so you always vary a lot on your suggestions!",
-                    "description": "Realistic",
-                    "title": "Art Style",
-                    "type": "string"
-                },
-                "output_type": {
-                    "allOf": [
-                        {
-                            "$ref": "#/$defs/OutputTypeType"
-                        }
-                    ],
-                    "default": "string",
-                    "description": "The type of output to return"
-                },
-                "openai_model": {
-                    "allOf": [
-                        {
-                            "$ref": "#/$defs/LLMModelType"
-                        }
-                    ],
-                    "default": "gpt-3.5-turbo",
-                    "description": "OpenAI model to bring your character to life"
-                },
-                "completion_max_tokens": {
-                    "default": 350,
-                    "description": "The maximum number of tokens to generate the prompt.",
-                    "title": "Completion Max Tokens",
-                    "type": "integer"
-                },
-                "temperature": {
-                    "default": 0.7,
-                    "description": "Temperature of the model, between 0 (more precise) and 1 (more creative)",
-                    "exclusiveMinimum": 0.0,
-                    "maximum": 1.0,
-                    "title": "Temperature",
-                    "type": "number"
-                }
-            },
-            "required": [
-                "context"
-            ],
-            "title": "InputModel",
-            "type": "object"
-        },
-        "output_schema": {
-            "description": "PromptCreatorForImageGeneratorPiece output model",
-            "properties": {
-                "generated_prompt_string": {
-                    "default": null,
-                    "description": "The generated prompt to pass to an image generator AI",
-                    "title": "Generated Prompt String",
-                    "type": "string"
-                },
-                "generated_prompt_file_path": {
-                    "default": null,
-                    "description": "The path to the generated prompt, in .txt format",
-                    "title": "Generated Prompt File Path",
-                    "type": "string"
-                }
-            },
-            "title": "OutputModel",
-            "type": "object"
-        },
-        "secrets_schema": {
-            "description": "PromptCreatorForImageGeneratorPiece secrets model",
-            "properties": {
-                "OPENAI_API_KEY": {
-                    "description": "Your OpenAI API key",
-                    "title": "Openai Api Key",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "OPENAI_API_KEY"
-            ],
-            "title": "SecretsModel",
-            "type": "object"
-        },
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/PromptCreatorForImageGeneratorPiece"
-    },
-    "TextSummarizerPiece": {
-        "name": "TextSummarizerPiece",
+    "InformationExtractionPiece": {
+        "name": "InformationExtractionPiece",
         "dependency": {
             "dockerfile": "Dockerfile_01",
             "requirements_file": null
         },
         "tags": [
             "text",
-            "summarizer",
+            "information extraction",
             "openai"
         ],
         "style": {
-            "node_label": "Text Summarizer",
+            "node_label": "Information Extraction",
             "node_type": "default",
             "node_style": {
                 "backgroundColor": "#ebebeb"
@@ -906,53 +918,70 @@
                 "cursor": "pointer"
             }
         },
-        "description": "This Piece runs a text summarizer using OpenAI API.",
+        "description": "Extracts user-defined information from the input text.",
         "input_schema": {
             "$defs": {
                 "LLMModelType": {
                     "description": "OpenAI model type",
                     "enum": [
-                        "gpt-3.5-turbo",
+                        "gpt-3.5-turbo-1106",
                         "gpt-4"
                     ],
                     "title": "LLMModelType",
                     "type": "string"
                 },
-                "OutputTypeType": {
-                    "description": "Output type for the completion result",
+                "OutputModifierItemType": {
+                    "description": "OutputArgsType Enum",
                     "enum": [
-                        "file",
                         "string",
-                        "file_and_string"
+                        "integer",
+                        "float",
+                        "boolean",
+                        "array"
                     ],
-                    "title": "OutputTypeType",
+                    "title": "OutputModifierItemType",
                     "type": "string"
+                },
+                "OutputModifierModel": {
+                    "properties": {
+                        "name": {
+                            "description": "Name of the output argument.",
+                            "from_upstream": "never",
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "type": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/$defs/OutputModifierItemType"
+                                }
+                            ],
+                            "default": "string",
+                            "description": "Type of the output argument.",
+                            "from_upstream": "never"
+                        },
+                        "description": {
+                            "default": "",
+                            "description": "Description of the output argument.",
+                            "from_upstream": "never",
+                            "title": "Description",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name"
+                    ],
+                    "title": "OutputModifierModel",
+                    "type": "object"
                 }
             },
-            "description": "TextSummarizerPiece Input model",
+            "description": "InformationExtractionPiece Input model",
             "properties": {
-                "text": {
-                    "default": "",
-                    "description": "Text to summarize",
-                    "title": "Text",
-                    "type": "string",
-                    "widget": "textarea"
-                },
-                "text_file_path": {
-                    "default": "",
-                    "description": "Use it only if not using text field. File path to the text to summarize",
+                "input_text": {
+                    "description": "Source text from where information should be extracted.",
                     "from_upstream": "always",
-                    "title": "Text File Path",
+                    "title": "Input Text",
                     "type": "string"
-                },
-                "output_type": {
-                    "allOf": [
-                        {
-                            "$ref": "#/$defs/OutputTypeType"
-                        }
-                    ],
-                    "default": "string",
-                    "description": "The type of output to return"
                 },
                 "openai_model": {
                     "allOf": [
@@ -960,61 +989,65 @@
                             "$ref": "#/$defs/LLMModelType"
                         }
                     ],
-                    "default": "gpt-3.5-turbo",
-                    "description": "OpenAI model name to use for summarization"
+                    "default": "gpt-3.5-turbo-1106",
+                    "description": "OpenAI model name to use for information extraction."
                 },
-                "chunk_size": {
-                    "default": 1000,
-                    "description": "Chunk size, measured in tokens, of each pre-summary chunk",
-                    "title": "Chunk Size",
-                    "type": "integer"
-                },
-                "chunk_overlap_rate": {
-                    "default": 0.2,
-                    "description": "The percentage of overlap between each chunk",
-                    "title": "Chunk Overlap Rate",
-                    "type": "number"
-                },
-                "completion_max_tokens": {
-                    "default": 500,
-                    "description": "The maximum number of tokens to generate in the summary.",
-                    "title": "Completion Max Tokens",
-                    "type": "integer"
-                },
-                "temperature": {
-                    "default": 0.2,
-                    "description": "Temperature of the model, between 0 (more precise) and 1 (more creative)",
-                    "title": "Temperature",
-                    "type": "number"
+                "extract_items": {
+                    "default": [
+                        {
+                            "description": "Name of the person.",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "description": "Age of the person.",
+                            "name": "age",
+                            "type": "integer"
+                        }
+                    ],
+                    "description": "Information items to be extracted from source text.",
+                    "from_upstream": "never",
+                    "items": {
+                        "$ref": "#/$defs/OutputModifierModel"
+                    },
+                    "title": "Extract Items",
+                    "type": "array"
                 }
             },
+            "required": [
+                "input_text"
+            ],
             "title": "InputModel",
             "type": "object"
         },
         "output_schema": {
-            "description": "TextSummarizerPiece Output model",
+            "additionalProperties": true,
+            "description": "InformationExtractionPiece Output Model",
             "properties": {
-                "string_summarized_text": {
-                    "default": null,
-                    "description": "summarized text",
-                    "title": "String Summarized Text",
-                    "type": "string"
-                },
-                "file_path_summarized_text": {
-                    "default": null,
-                    "description": "Path to summarized text file",
-                    "title": "File Path Summarized Text",
-                    "type": "string"
+                "output_data": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Extracted information as Stringfieid JSON.",
+                    "title": "Output Data"
                 }
             },
+            "required": [
+                "output_data"
+            ],
             "title": "OutputModel",
             "type": "object"
         },
         "secrets_schema": {
-            "description": "TextSummarizerPiece Secrets model",
+            "description": "InformationExtractionPiece Secrets model",
             "properties": {
                 "OPENAI_API_KEY": {
-                    "description": "Your OpenAI API key",
+                    "description": "Your OpenAI API key.",
                     "title": "Openai Api Key",
                     "type": "string"
                 }
@@ -1025,122 +1058,7 @@
             "title": "SecretsModel",
             "type": "object"
         },
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/TextSummarizerPiece"
-    },
-    "AudioTranscriptionLocalPiece": {
-        "name": "AudioTranscriptionLocalPiece",
-        "dependency": {
-            "dockerfile": "Dockerfile_whisper",
-            "requirements_file": null
-        },
-        "tags": [],
-        "style": {
-            "node_label": "Audio Transcription Local",
-            "node_type": "default",
-            "node_style": {
-                "backgroundColor": "#ebebeb"
-            },
-            "useIcon": true,
-            "icon_class_name": "fa-solid:comment-dots",
-            "iconStyle": {
-                "cursor": "pointer"
-            }
-        },
-        "description": "Runs transcription locally using Whisper, a general-purpose speech recognition model. Ref: https://github.com/openai/whisper",
-        "container_resources": {
-            "use_gpu": true,
-            "requests": {
-                "cpu": 1000,
-                "memory": 3000
-            },
-            "limits": {
-                "cpu": 5000,
-                "memory": 15000
-            }
-        },
-        "input_schema": {
-            "$defs": {
-                "ModelSizeType": {
-                    "enum": [
-                        "tiny",
-                        "base",
-                        "small",
-                        "medium",
-                        "large"
-                    ],
-                    "title": "ModelSizeType",
-                    "type": "string"
-                },
-                "OutputTypeType": {
-                    "enum": [
-                        "string",
-                        "file",
-                        "both"
-                    ],
-                    "title": "OutputTypeType",
-                    "type": "string"
-                }
-            },
-            "properties": {
-                "audio_file_path": {
-                    "description": "The path to the audio file to process.",
-                    "from_upstream": "always",
-                    "title": "Audio File Path",
-                    "type": "string"
-                },
-                "output_type": {
-                    "allOf": [
-                        {
-                            "$ref": "#/$defs/OutputTypeType"
-                        }
-                    ],
-                    "default": "string",
-                    "description": "The type of output for the result text. Options are `string`, `file` or `both`. Default is `string`."
-                },
-                "model_size": {
-                    "allOf": [
-                        {
-                            "$ref": "#/$defs/ModelSizeType"
-                        }
-                    ],
-                    "default": "tiny",
-                    "description": "The size of the model to use. Default is tiny."
-                }
-            },
-            "required": [
-                "audio_file_path"
-            ],
-            "title": "InputModel",
-            "type": "object"
-        },
-        "output_schema": {
-            "properties": {
-                "transcription_result": {
-                    "default": "",
-                    "description": "The result transcription text as a string.",
-                    "title": "Transcription Result",
-                    "type": "string"
-                },
-                "file_path_transcription_result": {
-                    "anyOf": [
-                        {
-                            "format": "file-path",
-                            "type": "string"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ],
-                    "default": "",
-                    "description": "The path to the text file with the transcription result.",
-                    "title": "File Path Transcription Result"
-                }
-            },
-            "title": "OutputModel",
-            "type": "object"
-        },
-        "secrets_schema": null,
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/AudioTranscriptionLocalPiece"
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/InformationExtractionPiece"
     },
     "ImageGeneratorPiece": {
         "name": "ImageGeneratorPiece",
@@ -1270,6 +1188,6 @@
             "title": "SecretsModel",
             "type": "object"
         },
-        "source_url": "https://github.com/Tauffer-Consulting/openai_domino_pieces/tree/main/pieces/ImageGeneratorPiece"
+        "source_url": "https://github.com/nathan-vm/openai_api_pieces/tree/main/pieces/ImageGeneratorPiece"
     }
 }
