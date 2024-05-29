@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
 from typing import List
-from domino.models import OutputModifierModel, OutputModifierItemType
 from typing import Optional
 
 class LLMModelType(str, Enum):
@@ -11,6 +10,40 @@ class LLMModelType(str, Enum):
     gpt_3_5_turbo = "gpt-3.5-turbo-1106"
     gpt_4 = "gpt-4"
 
+class InputItemType(str, Enum):
+    """
+    OutputArgsType Enum
+    """
+    string = 'string'
+    integer = 'integer'
+    float = 'float'
+    boolean = 'boolean'
+    array = 'array'
+class InputItem(BaseModel):
+    name: str = Field(
+        description='Name of the output argument.',
+        json_schema_extra={
+            "from_upstream": "never"
+        }
+    )
+    type: InputItemType = Field(
+        default=InputItemType.string,
+        description='Type of the output argument.',
+        json_schema_extra={
+            "from_upstream": "never"
+        },
+    )
+    description: str = Field(
+        default="",
+        description='Description of the output argument.',
+        json_schema_extra={
+            "from_upstream": "never"
+        }
+    )
+
+    name: str = Field()
+    type: str = Field()
+    description: str = Field()
 
 class InputModel(BaseModel):
     """
@@ -28,10 +61,10 @@ class InputModel(BaseModel):
         default=LLMModelType.gpt_3_5_turbo,
         description="OpenAI model name to use for information extraction.",
     )
-    extract_items: List[OutputModifierModel] = Field(
+    extract_items: List[InputItem] = Field(
         default=[
-            OutputModifierModel(name="name", type=OutputModifierItemType.string, description="Name of the person."),
-            OutputModifierModel(name="age", type=OutputModifierItemType.integer, description="Age of the person."),
+            InputItem(name="name", type=InputItemType.string, description="Name of the person."),
+            InputItem(name="age", type=InputItemType.integer, description="Age of the person."),
         ],
         description='Information items to be extracted from source text.',
         json_schema_extra={"from_upstream": "never"}

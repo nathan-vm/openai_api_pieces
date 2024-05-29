@@ -22,12 +22,15 @@ class FileInformationExtractionPiece(BasePiece):
 
         if isinstance(file_content, dict):
             output_json = self.extract_json_infos(content=file_content, extract_items=input_data.extract_items, model=input_data.openai_model, additional_info=input_data.additional_information)
-            result.append(output_json)
+            if output_json: 
+                result.append(output_json)
         elif isinstance(file_content, list):
+            # file_content = file_content[:3]
             for i, item_content in enumerate(file_content):
                 self.logger.info(f"Extract item i:{i}")
                 output_json = self.extract_json_infos(content=item_content, extract_items=input_data.extract_items, model=input_data.openai_model,additional_info=input_data.additional_information)
-                result.append(output_json)
+                if output_json: 
+                    result.append(output_json)
 
         self.logger.info(result)
 
@@ -39,11 +42,12 @@ class FileInformationExtractionPiece(BasePiece):
 
     def extract_json_infos(self, content: dict, extract_items: dict, model: str, additional_info: Optional[str] = None):
 
-        optional_additional_info = "" if not additional_info else f"You can use the following additional information to help filling the request items to be extracted. Additional information: {additional_info}."
+        optional_additional_info = "" if not additional_info else f"You can use the following additional information to help filling the request items to be extracted. Additional information: {additional_info}"
 
         prompt = f"""Extract the following information from the text below as JSON.
 The output can be a simple json or a list of jsons but never a nested json.
-{optional_additional_info}
+If you dont find all requested information return a empty JSON {{}}.
+{optional_additional_info}.
 Use the items to be extract as information to identify the right information to be extract:
 ---
 Input text: {content}
